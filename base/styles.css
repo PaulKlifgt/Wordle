@@ -46,11 +46,11 @@ input:focus{
 }
 
 .cell-delete{
-   width: 105px;
+   width: 95px;
 }
 
 .cell-enter{
-    width: 105px;
+    width: 95px;
 }
 
 .cell_button{
@@ -58,6 +58,7 @@ input:focus{
     height: fit-content;
     margin: 5px;
     border: 2px solid #ccc;
+    padding: 0;
     .cell{
         margin: 0;
         border: 0; 

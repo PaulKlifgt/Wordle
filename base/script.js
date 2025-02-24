@@ -18,6 +18,8 @@ function CreateKeyboard(){
         if(i==2){
             cell_button = document.createElement("button");
             cell_button.classList.add("cell_button");
+            cell_button.addEventListener("click", OnKeyBoardDelete);
+
             cell = document.createElement("div");
             cell.classList.add("cell");
             cell.classList.add("cell-delete");
@@ -32,6 +34,8 @@ function CreateKeyboard(){
 
             cell_button = document.createElement("button");
             cell_button.classList.add("cell_button");
+            cell_button.addEventListener('click', OnKeyBoardClick);
+
             cell = document.createElement("div");
             cell.classList.add("cell");
             cell.id = rows[i][j];
@@ -45,12 +49,14 @@ function CreateKeyboard(){
         if(i==2){
             cell_button = document.createElement("button");
             cell_button.classList.add("cell_button");
+            cell_button.addEventListener("click", processGuess);
+
             cell = document.createElement("div");
             cell.classList.add("cell");
             cell.id = "enter";
             cell.classList.add("cell-enter");
             cell.innerText = 'ENTER'
-            cell_button.addEventListener("click", processGuess);
+            
 
             row.appendChild(cell_button);
             cell_button.appendChild(cell);
@@ -83,6 +89,13 @@ function CreateBoard() {
         input_letter.type = "text";
         input_letter.maxLength = "1";
         input_letter.classList.add("input_one");
+        input_letter.addEventListener('keypress', function (e) {
+            var key = e.which || e.keyCode;
+            if (key === 13) { 
+                processGuess();
+            }
+        });
+        
         cell_next = document.getElementById(String(0)+String(i));
         input_letter.id = "inp"+cell_next.id;
         input_letter.addEventListener('input', NextEnter);
@@ -104,15 +117,14 @@ function processGuess() {
         guessInput += input_n.value;
     }
 
-    console.log(guessInput)
     if (guessInput.length !== 5) {
         alert("Слово должно состоять из 5 букв.");
         return;
     }
 
     UpdateBoard(guessInput);
+    UpdateKeyBoard(guessInput);
     
-
     if (guessInput === secretWord) {
         document.getElementById("message").innerText = "Поздравляем! Вы угадали слово!";
         return;
@@ -128,8 +140,30 @@ function processGuess() {
 }
 
 
-function OnKeyBoardClick(letter) {
+function OnKeyBoardDelete(e) {
+    let inputs = document.getElementsByClassName("input_one");
+    for (let i = 4; i >= 0; i--){
+        if (inputs[i].value !== ''){
+            inputs[i].value = '';
+            inputs[i].focus();
+            break;
+        }
+    }
+}
 
+
+function OnKeyBoardClick(e) {
+    let letter = e.target.id;
+    let inputs = document.getElementsByClassName("input_one");
+    for (let i = 0; i < 5; i++){
+        if (inputs[i].value === ''){
+            inputs[i].value = letter;
+            if (i<4){
+                inputs[i+1].focus();
+            }
+            break;
+        }
+    }
 }
 
 
@@ -137,7 +171,6 @@ function UpdateBoard(guess) {
    
     for (let i = 0; i < 5; i++) {
         cell = document.getElementById(String(6-attempts)+String(i))
-        console.log(String(attempts)+String(i))
         cell.innerText = guess[i];
         if (guess[i] === secretWord[i]) {
             cell.classList.add("correct");
@@ -146,19 +179,44 @@ function UpdateBoard(guess) {
         } else {
             cell.classList.add("absent");
         }
-        input_letter = document.createElement("input");
-        input_letter.type = "text";
-        input_letter.maxLength = "1";
-        input_letter.classList.add("input_one");
-        input_letter.addEventListener('input', NextEnter);
-        cell_next = document.getElementById(String(6-attempts+1)+String(i));
-        input_letter.id = "inp"+cell_next.id;
-        cell_next.appendChild(input_letter);
+        
+        if (attempts > 1){
+            input_letter = document.createElement("input");
+            input_letter.type = "text";
+            input_letter.maxLength = "1";
+            input_letter.classList.add("input_one");
+            input_letter.addEventListener('input', NextEnter);
+            cell_next = document.getElementById(String(6-attempts+1)+String(i));
+            input_letter.id = "inp"+cell_next.id;
+            cell_next.appendChild(input_letter);
+        }
+        
     }
-    let input = document.getElementById("inp"+String(6-attempts+1)+"0");
-    input.focus();
+    if (attempts > 1){
+        let input = document.getElementById("inp"+String(6-attempts+1)+"0");
+        input.focus();
+    }
+    
 
 }
+
+
+function UpdateKeyBoard(guessInput){
+    for (let i = 0; i < guessInput.length; i++){
+        let key = document.getElementById(guessInput[i]);
+        
+        if (guessInput[i] === secretWord[i]){
+            key.classList.add("correct");
+        }
+        else if (secretWord.includes(guessInput[i])){
+            key.classList.add("present");
+        }
+        else{
+            key.classList.add("absent");
+        }
+    }
+}
+
 
 function NextEnter(e) {
     let id = e.target.id;
