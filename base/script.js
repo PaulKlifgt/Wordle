@@ -1,8 +1,5 @@
-const words = ["apple", "basel", "allow", "chain", "opera"];
-const secretWord = words[Math.floor(Math.random() * words.length)];
+const secretWord = WordsList[Math.floor(Math.random() * WordsList.length)];
 let attempts = 6;
-let letterStatuses = {};
-
 
 CreateKeyboard();
 CreateBoard();
@@ -117,6 +114,11 @@ function processGuess() {
         guessInput += input_n.value;
     }
 
+    if (!(WordsList.includes(guessInput))){
+        alert("Такого слова нет в словаре!");
+        return;
+    }
+
     if (guessInput.length !== 5) {
         alert("Слово должно состоять из 5 букв.");
         return;
@@ -186,6 +188,13 @@ function UpdateBoard(guess) {
             input_letter.maxLength = "1";
             input_letter.classList.add("input_one");
             input_letter.addEventListener('input', NextEnter);
+            input_letter.addEventListener('keypress', function (e) {
+                var key = e.which || e.keyCode;
+                if (key === 13) { 
+                    processGuess();
+                }
+            });
+            
             cell_next = document.getElementById(String(6-attempts+1)+String(i));
             input_letter.id = "inp"+cell_next.id;
             cell_next.appendChild(input_letter);
